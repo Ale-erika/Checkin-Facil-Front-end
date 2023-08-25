@@ -1,5 +1,6 @@
 import express from "express";
 import { promises as fs } from "fs";
+import sendEmail from "../sendEmail.js";
 
 const { readFile, writeFile } = fs;
 
@@ -14,6 +15,10 @@ router.post("/", async (req, res) => {
 
     data.dadosHospede.push(fichaHospedagem);
     await writeFile("dadosHospede.json", JSON.stringify(data, null, 2));
+
+    // enviar email resposta ao hóspede
+    const email = fichaHospedagem.email;
+    sendEmail(email);
 
     return res.json({
       error: false,
