@@ -1,16 +1,15 @@
 import express from "express";
-import dadosCheckin from "./controllers/dadosCheckin.js";
-import { promises as fs } from "fs";
+import dadosCheckin from "./routes/checkin.route.js";
 import cors from "cors";
-
-const { readFile, writeFile } = fs;
+import sendEmail from "./sendEmail.js";
+import sendLink from "./sendLink.js";
 
 const app = express();
 
+// middleware para receber os dados no corpo da requisição
 app.use(express.json());
 
-// Criar middlware para permitir requisição externa
-
+// middlware para permitir requisição externa
 app.use((req, res, next) => {
   // qqer endereço pode fazer a requisição
   res.header("Access-Control-Allow-Origin", "*");
@@ -23,23 +22,9 @@ app.use((req, res, next) => {
   next();
 });
 
+// Criar rotas
 app.use("/checkin", dadosCheckin);
 
-app.listen(8080, async () => {
-  try {
-    await readFile("dadosHospede.json");
-    console.log("API Started");
-  } catch (err) {
-    const initialJson = {
-      nextId: 1,
-      dadosHospede: [],
-    };
-    writeFile("dadosHospede.json", JSON.stringify(initialJson))
-      .then(() => {
-        console.log("API Started and File Created");
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
-});
+sendLink("ricardo.botelho@gmail.com");
+
+app.listen(8080, () => console.log("API Started"));
